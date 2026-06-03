@@ -262,6 +262,9 @@
             }
         }
 
+        # Add ClientType header to get a dedicated throttle bucket for Cost Management API
+        $Header['ClientType'] = 'FMP-Reporting'
+
         $startAPICall = Get-Date
         $rawException = $null
         $saTokenRefreshed = $false
