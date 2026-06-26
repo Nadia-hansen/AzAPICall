@@ -1017,6 +1017,7 @@ function AzAPICallErrorHandler {
     elseif (
         $getARMCostManagement -and (
             $catchResult.error.code -eq 404 -or
+            ($catchResult.error.code -eq 'NotFound' -and $catchResult.error.message -like '*returns null or empty list for id*') -or # FMP: tolerate parked/new subscriptions
             $catchResult.error.code -eq 'AccountCostDisabled' -or
             $catchResult.error.code -eq 'SubscriptionCostDisabled' -or
             $catchResult.error.message -like '*does not have any valid subscriptions*' -or
@@ -1030,8 +1031,8 @@ function AzAPICallErrorHandler {
         )
 
     ) {
-        if ($catchResult.error.code -eq 404) {
-            Logging -preventWriteOutput $true -logMessage "$defaultErrorInfo - (plain : $catchResult) - AzAPICall: seems Subscriptions was created only recently - skipping"
+        if ($catchResult.error.code -eq 404 -or ($catchResult.error.code -eq 'NotFound' -and $catchResult.error.message -like '*returns null or empty list for id*')) { # FMP: tolerate parked/new subscriptions
+            Logging -preventWriteOutput $true -logMessage "$defaultErrorInfo - (plain : $catchResult) - AzAPICall: seems Subscriptions was created only recently or is parked - skipping"
             $response = @{
                 action = 'returnCollection' #break or return or returnCollection
             }
